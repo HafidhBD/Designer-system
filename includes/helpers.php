@@ -98,7 +98,7 @@ function getDesigners() {
  */
 function getAllUsers() {
     $pdo = getDBConnection();
-    $stmt = $pdo->query("SELECT id, full_name, email, role, created_at FROM users ORDER BY role, full_name");
+    $stmt = $pdo->query("SELECT id, full_name, email, role, telegram_chat_id, created_at FROM users ORDER BY role, full_name");
     return $stmt->fetchAll();
 }
 
@@ -107,7 +107,7 @@ function getAllUsers() {
  */
 function getUserById($id) {
     $pdo = getDBConnection();
-    $stmt = $pdo->prepare("SELECT id, full_name, email, role, language_preference, created_at FROM users WHERE id = ?");
+    $stmt = $pdo->prepare("SELECT id, full_name, email, role, language_preference, telegram_chat_id, created_at FROM users WHERE id = ?");
     $stmt->execute([$id]);
     return $stmt->fetch();
 }
@@ -153,4 +153,39 @@ function logStatusChange($taskId, $oldStatus, $newStatus, $changedBy) {
     $pdo = getDBConnection();
     $stmt = $pdo->prepare("INSERT INTO task_status_logs (task_id, old_status, new_status, changed_by, changed_at) VALUES (?, ?, ?, ?, NOW())");
     $stmt->execute([$taskId, $oldStatus, $newStatus, $changedBy]);
+}
+
+/**
+ * Handle file upload for design delivery
+ */
+function handleDesignUpload($file, $taskId) {
+    if (!isset($file) || $file['error'] !== UPLOAD_ERR_OK) {
+        return ['success' => false, 'error' => __('upload_error')];
+    }
+
+    // Check file size
+    if ($file['size'] > MAX_UPLOAD_SIZE) {
+        return ['success' => false, 'error' => __('upload_too_large')];
+    }
+
+    // Check extension
+    $ext = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
+    if (!in_array($ext, ALLOWED_EXTENSIONS)) {
+        return ['success' => false, 'error' => __('upload_invalid')];
+    }
+
+    // Create uploads directory if not exists
+    if (!is_dir(UPLOAD_DIR)) {
+        mkdir(UPLOAD_DIR, 0755, true);
+    }
+
+    // Generate unique filename
+    $newName = 'task_' . $taskId . '_' . time() . '_' . bin2hex(random_bytes(4)) . '.' . $ext;
+    $destPath = UPLOAD_DIR . $newName;
+
+    if (move_uploaded_file($file['tmp_name'], $destPath)) {
+        return ['success' => true, 'filename' => $newName, 'path' => $destPath];
+    }
+
+    return ['success' => false, 'error' => __('upload_error')];
 }

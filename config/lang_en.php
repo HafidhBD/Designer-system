@@ -149,6 +149,24 @@ $lang = [
     'email_exists'      => 'This email is already registered',
     'password_min'      => 'Password must be at least 6 characters',
 
+    // File Upload
+    'upload_design'     => 'Upload Design File',
+    'upload_required'   => 'You must upload the design file when marking as delivered',
+    'upload_file'       => 'Design File',
+    'upload_success'    => 'File uploaded successfully',
+    'upload_error'      => 'Error uploading file',
+    'upload_invalid'    => 'Invalid file type. Allowed: JPG, PNG, GIF, PDF, AI, PSD, SVG, EPS, ZIP, RAR, MP4, MOV, WEBP',
+    'upload_too_large'  => 'File is too large. Maximum size: 20MB',
+    'download_file'     => 'Download Design File',
+    'design_file'       => 'Design File',
+    'no_file_uploaded'  => 'No design file uploaded yet',
+    'view_file'         => 'View / Download File',
+
+    // Telegram
+    'telegram_chat_id'  => 'Telegram Chat ID',
+    'telegram_hint'     => 'Send /start to @WavesDesignerbot then enter your Chat ID here',
+    'telegram_notified' => 'Telegram notification sent',
+
     // Misc
     'copyright'         => '© 2025 Design Task Manager. All rights reserved.',
     'switch_lang'       => 'العربية',

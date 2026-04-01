@@ -149,6 +149,24 @@ $lang = [
     'email_exists'      => 'هذا البريد الإلكتروني مسجل بالفعل',
     'password_min'      => 'يجب أن تكون كلمة المرور 6 أحرف على الأقل',
 
+    // File Upload
+    'upload_design'     => 'رفع ملف التصميم',
+    'upload_required'   => 'يجب رفع ملف التصميم عند تحويل الحالة إلى تم التسليم',
+    'upload_file'       => 'ملف التصميم',
+    'upload_success'    => 'تم رفع الملف بنجاح',
+    'upload_error'      => 'حدث خطأ أثناء رفع الملف',
+    'upload_invalid'    => 'نوع الملف غير مسموح. المسموح: JPG, PNG, GIF, PDF, AI, PSD, SVG, EPS, ZIP, RAR, MP4, MOV, WEBP',
+    'upload_too_large'  => 'حجم الملف كبير جداً. الحد الأقصى: 20 ميجابايت',
+    'download_file'     => 'تحميل ملف التصميم',
+    'design_file'       => 'ملف التصميم',
+    'no_file_uploaded'  => 'لم يتم رفع ملف تصميم بعد',
+    'view_file'         => 'عرض / تحميل الملف',
+
+    // Telegram
+    'telegram_chat_id'  => 'معرّف تيليجرام (Chat ID)',
+    'telegram_hint'     => 'أرسل /start إلى @WavesDesignerbot ثم أدخل معرّف المحادثة هنا',
+    'telegram_notified' => 'تم إرسال إشعار تيليجرام',
+
     // Misc
     'copyright'         => '© 2025 نظام إدارة مهام التصميم. جميع الحقوق محفوظة.',
     'switch_lang'       => 'English',

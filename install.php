@@ -97,6 +97,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['install'])) {
                     `password` VARCHAR(255) NOT NULL,
                     `role` ENUM('manager', 'designer') NOT NULL DEFAULT 'designer',
                     `language_preference` ENUM('en', 'ar') NOT NULL DEFAULT 'en',
+                    `telegram_chat_id` VARCHAR(50) NULL DEFAULT NULL,
                     `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
                     `updated_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
                     PRIMARY KEY (`id`),
@@ -116,6 +117,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['install'])) {
                     `assigned_to` INT UNSIGNED NOT NULL,
                     `progress_percentage` TINYINT UNSIGNED NOT NULL DEFAULT 0,
                     `status` ENUM('new', 'in_progress', 'delivered') NOT NULL DEFAULT 'new',
+                    `file_path` VARCHAR(500) NULL DEFAULT NULL,
                     `created_by` INT UNSIGNED NOT NULL,
                     `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
                     `updated_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -147,6 +149,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['install'])) {
                 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
             ");
             $messages[] = "Table <strong>task_status_logs</strong> created.";
+
+            // Step 2b: Upgrade — add new columns if missing (for existing installations)
+            try {
+                $cols = $pdo->query("SHOW COLUMNS FROM users LIKE 'telegram_chat_id'")->rowCount();
+                if ($cols == 0) {
+                    $pdo->exec("ALTER TABLE `users` ADD COLUMN `telegram_chat_id` VARCHAR(50) NULL DEFAULT NULL AFTER `language_preference`");
+                    $messages[] = "Column <strong>telegram_chat_id</strong> added to users.";
+                }
+            } catch (PDOException $e) { /* column may already exist */ }
+
+            try {
+                $cols = $pdo->query("SHOW COLUMNS FROM tasks LIKE 'file_path'")->rowCount();
+                if ($cols == 0) {
+                    $pdo->exec("ALTER TABLE `tasks` ADD COLUMN `file_path` VARCHAR(500) NULL DEFAULT NULL AFTER `status`");
+                    $messages[] = "Column <strong>file_path</strong> added to tasks.";
+                }
+            } catch (PDOException $e) { /* column may already exist */ }
 
             // Step 3: Seed data (only if users table is empty)
             $cnt = $pdo->query("SELECT COUNT(*) as c FROM users")->fetch()['c'];
@@ -284,8 +303,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['install'])) {
         <p class="sm tc rd mt">⚠️ DELETE install.php and setup_passwords.php immediately!</p>
 
     <?php elseif ($installed): ?>
-        <div class="warn"><strong>⚠️ Already installed.</strong><br>Tables already exist. To reinstall, drop them via phpMyAdmin first.</div>
-        <a href="/login.php" class="btn btn-success">Go to Login Page →</a>
+        <div class="warn"><strong>⚠️ Already installed.</strong><br>Tables already exist. You can upgrade to add new columns (Telegram, file upload) or go to login.</div>
+        <div style="display:flex;gap:10px;margin-top:16px;">
+            <a href="/login.php" class="btn btn-success">Go to Login Page →</a>
+        </div>
+        <form method="POST" style="margin-top:12px;">
+            <button type="submit" name="install" value="1" class="btn btn-warning"
+                    onclick="return confirm('Run upgrade to add new columns?')">
+                ↑ Upgrade Database (add new columns)
+            </button>
+        </form>
         <p class="sm tc rd mt">⚠️ DELETE install.php for security!</p>
 
     <?php else: ?>

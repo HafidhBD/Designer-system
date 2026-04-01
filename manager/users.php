@@ -42,11 +42,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $errors[] = __('error');
     }
 
-    $userId    = (int)($_POST['user_id'] ?? 0);
-    $fullName  = trim($_POST['full_name'] ?? '');
-    $email     = trim($_POST['email'] ?? '');
-    $password  = $_POST['password'] ?? '';
-    $role      = $_POST['role'] ?? ROLE_DESIGNER;
+    $userId         = (int)($_POST['user_id'] ?? 0);
+    $fullName       = trim($_POST['full_name'] ?? '');
+    $email          = trim($_POST['email'] ?? '');
+    $password       = $_POST['password'] ?? '';
+    $role           = $_POST['role'] ?? ROLE_DESIGNER;
+    $telegramChatId = trim($_POST['telegram_chat_id'] ?? '');
 
     // Validation
     if (empty($fullName)) $errors[] = __('full_name') . ': ' . __('required_field');
@@ -74,24 +75,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             // Update existing user
             if (!empty($password)) {
                 $hash = password_hash($password, PASSWORD_DEFAULT);
-                $stmt = $pdo->prepare("UPDATE users SET full_name = ?, email = ?, password = ?, role = ?, updated_at = NOW() WHERE id = ?");
-                $stmt->execute([$fullName, $email, $hash, $role, $userId]);
+                $stmt = $pdo->prepare("UPDATE users SET full_name = ?, email = ?, password = ?, role = ?, telegram_chat_id = ?, updated_at = NOW() WHERE id = ?");
+                $stmt->execute([$fullName, $email, $hash, $role, $telegramChatId ?: null, $userId]);
             } else {
-                $stmt = $pdo->prepare("UPDATE users SET full_name = ?, email = ?, role = ?, updated_at = NOW() WHERE id = ?");
-                $stmt->execute([$fullName, $email, $role, $userId]);
+                $stmt = $pdo->prepare("UPDATE users SET full_name = ?, email = ?, role = ?, telegram_chat_id = ?, updated_at = NOW() WHERE id = ?");
+                $stmt->execute([$fullName, $email, $role, $telegramChatId ?: null, $userId]);
             }
             redirectWith('/manager/users.php', 'success', __('user_updated'));
         } else {
             // Create new user
             $hash = password_hash($password, PASSWORD_DEFAULT);
-            $stmt = $pdo->prepare("INSERT INTO users (full_name, email, password, role) VALUES (?, ?, ?, ?)");
-            $stmt->execute([$fullName, $email, $hash, $role]);
+            $stmt = $pdo->prepare("INSERT INTO users (full_name, email, password, role, telegram_chat_id) VALUES (?, ?, ?, ?, ?)");
+            $stmt->execute([$fullName, $email, $hash, $role, $telegramChatId ?: null]);
             redirectWith('/manager/users.php', 'success', __('user_created'));
         }
     } else {
         // If editing, keep edit mode
         if ($userId > 0) {
-            $editUser = ['id' => $userId, 'full_name' => $fullName, 'email' => $email, 'role' => $role];
+            $editUser = ['id' => $userId, 'full_name' => $fullName, 'email' => $email, 'role' => $role, 'telegram_chat_id' => $telegramChatId];
         }
     }
 }
@@ -153,6 +154,16 @@ include __DIR__ . '/../templates/header.php';
             </div>
         </div>
 
+        <div class="form-row">
+            <div class="form-group">
+                <label class="form-label" for="telegram_chat_id"><?= __('telegram_chat_id') ?></label>
+                <input type="text" id="telegram_chat_id" name="telegram_chat_id" class="form-control" 
+                       value="<?= sanitize($editUser['telegram_chat_id'] ?? $telegramChatId ?? '') ?>"
+                       placeholder="e.g. 123456789">
+                <span class="form-hint"><?= __('telegram_hint') ?></span>
+            </div>
+        </div>
+
         <div class="btn-group">
             <button type="submit" class="btn btn-primary"><?= $editUser ? __('update') : __('create') ?></button>
             <?php if ($editUser): ?>
@@ -175,6 +186,7 @@ include __DIR__ . '/../templates/header.php';
                     <th><?= __('full_name') ?></th>
                     <th><?= __('email') ?></th>
                     <th><?= __('role') ?></th>
+                    <th><?= __('telegram_chat_id') ?></th>
                     <th><?= __('created_at') ?></th>
                     <th><?= __('actions') ?></th>
                 </tr>
@@ -190,6 +202,7 @@ include __DIR__ . '/../templates/header.php';
                             <?= $user['role'] === ROLE_MANAGER ? __('role_manager') : __('role_designer') ?>
                         </span>
                     </td>
+                    <td class="text-small"><?= !empty($user['telegram_chat_id']) ? sanitize($user['telegram_chat_id']) : '<span style="color:var(--text-secondary);">—</span>' ?></td>
                     <td class="text-small text-muted"><?= formatDateTime($user['created_at']) ?></td>
                     <td>
                         <div class="btn-group">

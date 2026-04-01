@@ -5,6 +5,7 @@
  */
 require_once __DIR__ . '/../includes/auth.php';
 require_once __DIR__ . '/../includes/helpers.php';
+require_once __DIR__ . '/../includes/telegram.php';
 
 requireDesigner();
 
@@ -22,7 +23,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['task_id'])) {
         $progress  = (int)($_POST['progress_percentage'] ?? 0);
 
         // Verify task belongs to this designer
-        $checkStmt = $pdo->prepare("SELECT id, status FROM tasks WHERE id = ? AND assigned_to = ?");
+        $checkStmt = $pdo->prepare("SELECT id, title, status FROM tasks WHERE id = ? AND assigned_to = ?");
         $checkStmt->execute([$taskId, $currentUser['id']]);
         $task = $checkStmt->fetch();
 
@@ -36,11 +37,41 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['task_id'])) {
                 $progress = 0;
             }
 
-            $updateStmt = $pdo->prepare("UPDATE tasks SET status = ?, progress_percentage = ?, updated_at = NOW() WHERE id = ?");
-            $updateStmt->execute([$newStatus, $progress, $taskId]);
+            // If delivering, file upload is required
+            $uploadedFile = null;
+            if ($newStatus === 'delivered') {
+                if (empty($_FILES['design_file']) || $_FILES['design_file']['error'] === UPLOAD_ERR_NO_FILE) {
+                    setFlash('error', __('upload_required'));
+                    header('Location: /designer/my_tasks.php?update=' . $taskId);
+                    exit;
+                }
+                $uploadResult = handleDesignUpload($_FILES['design_file'], $taskId);
+                if (!$uploadResult['success']) {
+                    setFlash('error', $uploadResult['error']);
+                    header('Location: /designer/my_tasks.php?update=' . $taskId);
+                    exit;
+                }
+                $uploadedFile = $uploadResult['filename'];
+                $progress = 100;
+            }
+
+            // Update task
+            if ($uploadedFile) {
+                $updateStmt = $pdo->prepare("UPDATE tasks SET status = ?, progress_percentage = ?, file_path = ?, updated_at = NOW() WHERE id = ?");
+                $updateStmt->execute([$newStatus, $progress, $uploadedFile, $taskId]);
+            } else {
+                $updateStmt = $pdo->prepare("UPDATE tasks SET status = ?, progress_percentage = ?, updated_at = NOW() WHERE id = ?");
+                $updateStmt->execute([$newStatus, $progress, $taskId]);
+            }
 
             if ($newStatus !== $task['status']) {
                 logStatusChange($taskId, $task['status'], $newStatus, $currentUser['id']);
+            }
+
+            // Notify manager via Telegram when task is delivered
+            if ($newStatus === 'delivered') {
+                $filePath = $uploadedFile ? UPLOAD_DIR . $uploadedFile : null;
+                notifyManagerTaskDelivered($currentUser['full_name'], $task['title'], $taskId, $filePath);
             }
 
             // Check if AJAX request
@@ -210,7 +241,7 @@ include __DIR__ . '/../templates/header.php';
             <h3 class="modal-title"><?= __('update_status') ?> — <?= sanitize($updateTask['title']) ?></h3>
             <a href="/designer/my_tasks.php" class="modal-close">&times;</a>
         </div>
-        <form method="POST" action="/designer/my_tasks.php">
+        <form method="POST" action="/designer/my_tasks.php" enctype="multipart/form-data">
             <?= csrfField() ?>
             <input type="hidden" name="task_id" value="<?= $updateTask['id'] ?>">
             <div class="modal-body">
@@ -245,14 +276,27 @@ include __DIR__ . '/../templates/header.php';
                 <!-- Status Update -->
                 <div class="form-group">
                     <label class="form-label" for="modal_status"><?= __('status') ?></label>
-                    <select id="modal_status" name="status" class="form-control">
+                    <select id="modal_status" name="status" class="form-control" onchange="toggleUploadField()">
                         <option value="in_progress" <?= $updateTask['status'] === 'in_progress' ? 'selected' : '' ?>><?= getStatusLabel('in_progress') ?></option>
                         <option value="delivered" <?= $updateTask['status'] === 'delivered' ? 'selected' : '' ?>><?= getStatusLabel('delivered') ?></option>
                     </select>
                 </div>
 
+                <!-- Design File Upload (shown only when status = delivered) -->
+                <div class="form-group" id="uploadField" style="display:<?= $updateTask['status'] === 'delivered' ? 'block' : 'none' ?>;">
+                    <label class="form-label" for="design_file"><?= __('upload_design') ?> *</label>
+                    <input type="file" id="design_file" name="design_file" class="form-control"
+                           accept=".jpg,.jpeg,.png,.gif,.pdf,.ai,.psd,.svg,.eps,.zip,.rar,.mp4,.mov,.webp">
+                    <span class="form-hint"><?= __('upload_required') ?></span>
+                    <?php if (!empty($updateTask['file_path'])): ?>
+                    <div class="mt-1" style="font-size:0.85rem;color:var(--text-secondary);">
+                        📎 <?= __('design_file') ?>: <a href="<?= UPLOAD_URL . sanitize($updateTask['file_path']) ?>" target="_blank"><?= sanitize($updateTask['file_path']) ?></a>
+                    </div>
+                    <?php endif; ?>
+                </div>
+
                 <!-- Progress Update -->
-                <div class="form-group">
+                <div class="form-group" id="progressField">
                     <label class="form-label" for="modal_progress"><?= __('progress') ?></label>
                     <select id="modal_progress" name="progress_percentage" class="form-control">
                         <?php foreach (PROGRESS_OPTIONS as $opt): ?>
@@ -273,6 +317,19 @@ include __DIR__ . '/../templates/header.php';
                 <button type="submit" class="btn btn-primary"><?= __('update') ?></button>
             </div>
         </form>
+        <script>
+        function toggleUploadField() {
+            var status = document.getElementById('modal_status').value;
+            var uploadField = document.getElementById('uploadField');
+            var progressField = document.getElementById('progressField');
+            if (status === 'delivered') {
+                uploadField.style.display = 'block';
+                document.getElementById('modal_progress').value = '100';
+            } else {
+                uploadField.style.display = 'none';
+            }
+        }
+        </script>
     </div>
 </div>
 <?php endif; ?>

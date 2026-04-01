@@ -4,6 +4,7 @@
  */
 require_once __DIR__ . '/../includes/auth.php';
 require_once __DIR__ . '/../includes/helpers.php';
+require_once __DIR__ . '/../includes/telegram.php';
 
 requireManager();
 
@@ -52,6 +53,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // Log initial status
         $taskId = $pdo->lastInsertId();
         logStatusChange($taskId, null, $status, getCurrentUser()['id']);
+
+        // Send Telegram notification to assigned designer
+        notifyDesignerNewTask(
+            $assignedTo,
+            $title,
+            $clientName,
+            getDesignTypeLabel($designType),
+            $deadline ?: null
+        );
 
         redirectWith('/manager/all_tasks.php', 'success', __('task_created'));
     }

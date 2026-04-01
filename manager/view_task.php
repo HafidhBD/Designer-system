@@ -126,6 +126,30 @@ include __DIR__ . '/../templates/header.php';
         <div class="detail-value" style="white-space: pre-wrap;"><?= sanitize($task['notes']) ?></div>
     </div>
     <?php endif; ?>
+
+    <!-- Design File -->
+    <div class="mt-2" style="border-top:1px solid var(--border);padding-top:16px;">
+        <div class="detail-label"><?= __('design_file') ?></div>
+        <div class="detail-value">
+            <?php if (!empty($task['file_path'])): ?>
+                <?php
+                    $fileUrl = UPLOAD_URL . $task['file_path'];
+                    $fileExt = strtolower(pathinfo($task['file_path'], PATHINFO_EXTENSION));
+                    $isImage = in_array($fileExt, ['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg']);
+                ?>
+                <?php if ($isImage): ?>
+                <div class="mb-2">
+                    <img src="<?= sanitize($fileUrl) ?>" alt="Design" style="max-width:100%;max-height:400px;border-radius:8px;border:1px solid var(--border);">
+                </div>
+                <?php endif; ?>
+                <a href="<?= sanitize($fileUrl) ?>" target="_blank" class="btn btn-sm btn-primary" download>
+                    📎 <?= __('download_file') ?> (<?= sanitize($task['file_path']) ?>)
+                </a>
+            <?php else: ?>
+                <span style="color:var(--text-secondary);"><?= __('no_file_uploaded') ?></span>
+            <?php endif; ?>
+        </div>
+    </div>
 </div>
 
 <?php if (!empty($logs)): ?>

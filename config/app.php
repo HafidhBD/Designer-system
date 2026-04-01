@@ -39,5 +39,15 @@ define('TASK_STATUSES', [
     'delivered'   => ['en' => 'Delivered', 'ar' => 'تم التسليم'],
 ]);
 
+// Telegram Bot Configuration
+define('TELEGRAM_BOT_TOKEN', '8640672656:AAEG4SVN2yHqnTZT6eYP45q5XqnWAsmPdvQ');
+define('TELEGRAM_API_URL', 'https://api.telegram.org/bot' . TELEGRAM_BOT_TOKEN);
+
+// Upload settings
+define('UPLOAD_DIR', __DIR__ . '/../uploads/');
+define('UPLOAD_URL', '/uploads/');
+define('MAX_UPLOAD_SIZE', 20 * 1024 * 1024); // 20MB
+define('ALLOWED_EXTENSIONS', ['jpg', 'jpeg', 'png', 'gif', 'pdf', 'ai', 'psd', 'svg', 'eps', 'zip', 'rar', 'mp4', 'mov', 'webp']);
+
 // Timezone
 date_default_timezone_set('Asia/Riyadh');
