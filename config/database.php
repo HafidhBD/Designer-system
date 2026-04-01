@@ -7,7 +7,7 @@
  */
 
 define('DB_HOST', 'localhost');           // Hostinger DB host (usually localhost or specific host)
-define('DB_NAME', 'u983353360_design');   // Your database name on Hostinger
+define('DB_NAME', 'u983353360_Designers'); // Your database name on Hostinger
 define('DB_USER', 'u983353360_Designers');
 define('DB_PASS', 'jMemyT6H8Q');
 define('DB_CHARSET', 'utf8mb4');
