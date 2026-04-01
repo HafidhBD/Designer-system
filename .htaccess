@@ -1,0 +1,29 @@
+# Deny access to config and includes directories
+<FilesMatch "\.(php|sql)$">
+    # Allow PHP files to be executed
+</FilesMatch>
+
+# Deny access to sensitive directories via direct URL
+RedirectMatch 403 ^/config/.*$
+RedirectMatch 403 ^/includes/.*$
+RedirectMatch 403 ^/database/.*$
+
+# Deny access to hidden files
+<FilesMatch "^\.">
+    Deny from all
+</FilesMatch>
+
+# Deny access to SQL files
+<FilesMatch "\.sql$">
+    Deny from all
+</FilesMatch>
+
+# Default charset
+AddDefaultCharset UTF-8
+
+# Prevent directory listing
+Options -Indexes
+
+# Error pages
+ErrorDocument 404 /login.php
+ErrorDocument 403 /login.php

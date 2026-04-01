@@ -1,0 +1,75 @@
+/* ============================================
+   RTL (Arabic) Overrides
+   ============================================ */
+
+/* Text alignment */
+.rtl {
+    text-align: right;
+}
+
+.rtl th,
+.rtl td {
+    text-align: right;
+}
+
+/* Form elements */
+.rtl .form-group {
+    text-align: right;
+}
+
+/* Select arrow */
+.rtl select.form-control {
+    background-position: left 12px center;
+    padding-left: 36px;
+    padding-right: 14px;
+}
+
+/* Sidebar nav icons */
+.rtl .nav-link {
+    flex-direction: row;
+}
+
+/* Alert close */
+.rtl .alert {
+    flex-direction: row-reverse;
+}
+
+/* Modal footer */
+.rtl .modal-footer {
+    justify-content: flex-start;
+}
+
+/* Top bar user info */
+.rtl .top-bar-right {
+    flex-direction: row-reverse;
+}
+
+/* Quick action buttons */
+.rtl .quick-action-btn {
+    flex-direction: row;
+}
+
+/* Breadcrumbs or other directional elements */
+.rtl .detail-label {
+    text-align: right;
+}
+
+/* Fix login form alignment */
+.rtl .login-form .form-group {
+    text-align: right;
+}
+
+/* Report stats */
+.rtl .report-stat {
+    flex-direction: row-reverse;
+}
+
+/* Card header */
+.rtl .card-header {
+    flex-direction: row-reverse;
+}
+
+/* Filter actions */
+.rtl .filter-actions {
+    flex-direction: row-reverse;
+}
