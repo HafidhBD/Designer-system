@@ -38,7 +38,7 @@ $switchLang = ($currentLang === 'en') ? 'ar' : 'en';
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= __('login_title') ?> - <?= __('app_name') ?></title>
-    <link rel="icon" href="/logo-wihte.png" type="image/png">
+    <link rel="icon" href="/logo-white.png" type="image/png">
     <link rel="stylesheet" href="/assets/css/style.css">
     <?php if ($dir === 'rtl'): ?>
     <link rel="stylesheet" href="/assets/css/rtl.css">
@@ -48,7 +48,7 @@ $switchLang = ($currentLang === 'en') ? 'ar' : 'en';
     <div class="login-page">
         <div class="login-card">
             <div class="login-logo">
-                <img src="/logo-wihte.png" alt="Logo">
+                <img src="/logo-white.png" alt="Logo">
             </div>
             <h1 class="login-title"><?= __('login_title') ?></h1>
             <p class="login-subtitle"><?= __('login_subtitle') ?></p>

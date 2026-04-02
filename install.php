@@ -252,7 +252,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['install'])) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Install — Design Task Manager</title>
-    <link rel="icon" href="/logo-wihte.png" type="image/png">
+    <link rel="icon" href="/logo-white.png" type="image/png">
     <style>
         *{margin:0;padding:0;box-sizing:border-box}
         body{font-family:'Segoe UI',-apple-system,BlinkMacSystemFont,Arial,sans-serif;background:linear-gradient(135deg,#1E293B 0%,#334155 50%,#1E293B 100%);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;color:#1E293B}
@@ -296,7 +296,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['install'])) {
 <body>
 <div class="card">
     <div class="hdr">
-        <img src="/logo-wihte.png" alt="Logo">
+        <img src="/logo-white.png" alt="Logo">
         <h1>Design Task Manager — Installer</h1>
         <p>Automated database setup & system installation</p>
     </div>
