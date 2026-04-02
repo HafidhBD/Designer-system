@@ -88,8 +88,7 @@ function isDueToday($deadline) {
  */
 function getDesigners() {
     $pdo = getDBConnection();
-    $stmt = $pdo->prepare("SELECT id, full_name, email FROM users WHERE role = ? ORDER BY full_name");
-    $stmt->execute([ROLE_DESIGNER]);
+    $stmt = $pdo->query("SELECT id, full_name, email, role FROM users ORDER BY FIELD(role, 'manager', 'designer'), full_name");
     return $stmt->fetchAll();
 }
 

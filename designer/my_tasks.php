@@ -8,7 +8,7 @@ require_once __DIR__ . '/../includes/helpers.php';
 require_once __DIR__ . '/../includes/telegram.php';
 require_once __DIR__ . '/../includes/notifications.php';
 
-requireDesigner();
+requireLogin();
 
 $pageTitle = __('nav_my_tasks');
 $currentUser = getCurrentUser();

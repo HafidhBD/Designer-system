@@ -132,7 +132,7 @@ include __DIR__ . '/../templates/header.php';
                     <option value=""><?= __('select_designer') ?></option>
                     <?php foreach ($designers as $designer): ?>
                     <option value="<?= $designer['id'] ?>" <?= $assignedTo == $designer['id'] ? 'selected' : '' ?>>
-                        <?= sanitize($designer['full_name']) ?>
+                        <?= sanitize($designer['full_name']) ?><?= $designer['role'] === 'manager' ? ' (' . __('role_manager') . ')' : '' ?>
                     </option>
                     <?php endforeach; ?>
                 </select>
