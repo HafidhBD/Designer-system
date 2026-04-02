@@ -167,6 +167,19 @@ $lang = [
     'telegram_hint'     => 'Send /start to @WavesDesignerbot then enter your Chat ID here',
     'telegram_notified' => 'Telegram notification sent',
 
+    // Notifications
+    'notifications'         => 'Notifications',
+    'no_notifications'      => 'No notifications',
+    'mark_all_read'         => 'Mark all as read',
+    'view_all_notifications'=> 'View All Notifications',
+    'just_now'              => 'Just now',
+    'minutes_ago'           => 'min ago',
+    'hours_ago'             => 'hr ago',
+    'days_ago'              => 'days ago',
+    'notif_new_task'        => 'New task assigned to you',
+    'notif_task_delivered'  => 'Task has been delivered',
+    'notif_task_updated'    => 'Task has been updated',
+
     // Misc
     'copyright'         => '© 2025 Design Task Manager. All rights reserved.',
     'switch_lang'       => 'العربية',

@@ -55,6 +55,25 @@ $langSwitchUrl .= '?' . http_build_query($queryParams);
             </div>
             <div class="top-bar-right">
                 <a href="<?= $langSwitchUrl ?>" class="btn btn-sm btn-outline lang-switch"><?= __('nav_language') ?></a>
+
+                <!-- Notification Bell -->
+                <div class="notif-wrapper" id="notifWrapper">
+                    <button class="notif-bell" id="notifBell" aria-label="<?= __('notifications') ?>">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
+                        <span class="notif-badge" id="notifBadge" style="display:none;">0</span>
+                    </button>
+                    <div class="notif-dropdown" id="notifDropdown">
+                        <div class="notif-header">
+                            <strong><?= __('notifications') ?></strong>
+                            <button class="notif-mark-all" id="notifMarkAll"><?= __('mark_all_read') ?></button>
+                        </div>
+                        <div class="notif-list" id="notifList">
+                            <div class="notif-empty"><?= __('no_notifications') ?></div>
+                        </div>
+                        <a href="/notifications.php" class="notif-footer"><?= __('view_all_notifications') ?></a>
+                    </div>
+                </div>
+
                 <div class="user-info">
                     <span class="user-name"><?= sanitize($currentUser['full_name']) ?></span>
                     <span class="user-role badge badge-role"><?= isManager() ? __('role_manager') : __('role_designer') ?></span>

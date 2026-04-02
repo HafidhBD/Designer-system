@@ -167,6 +167,19 @@ $lang = [
     'telegram_hint'     => 'أرسل /start إلى @WavesDesignerbot ثم أدخل معرّف المحادثة هنا',
     'telegram_notified' => 'تم إرسال إشعار تيليجرام',
 
+    // Notifications
+    'notifications'         => 'الإشعارات',
+    'no_notifications'      => 'لا توجد إشعارات',
+    'mark_all_read'         => 'تحديد الكل كمقروء',
+    'view_all_notifications'=> 'عرض جميع الإشعارات',
+    'just_now'              => 'الآن',
+    'minutes_ago'           => 'د',
+    'hours_ago'             => 'س',
+    'days_ago'              => 'أيام',
+    'notif_new_task'        => 'مهمة جديدة مسندة إليك',
+    'notif_task_delivered'  => 'تم تسليم المهمة',
+    'notif_task_updated'    => 'تم تحديث المهمة',
+
     // Misc
     'copyright'         => '© 2025 نظام إدارة مهام التصميم. جميع الحقوق محفوظة.',
     'switch_lang'       => 'English',

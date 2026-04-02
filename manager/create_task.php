@@ -5,6 +5,7 @@
 require_once __DIR__ . '/../includes/auth.php';
 require_once __DIR__ . '/../includes/helpers.php';
 require_once __DIR__ . '/../includes/telegram.php';
+require_once __DIR__ . '/../includes/notifications.php';
 
 requireManager();
 
@@ -61,6 +62,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $clientName,
             getDesignTypeLabel($designType),
             $deadline ?: null
+        );
+
+        // In-app notification to designer
+        createNotification(
+            $assignedTo,
+            'new_task',
+            __('notif_new_task'),
+            $title . ' — ' . $clientName,
+            '/designer/my_tasks.php?update=' . $taskId
         );
 
         redirectWith('/manager/all_tasks.php', 'success', __('task_created'));

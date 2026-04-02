@@ -6,6 +6,7 @@
 require_once __DIR__ . '/../includes/auth.php';
 require_once __DIR__ . '/../includes/helpers.php';
 require_once __DIR__ . '/../includes/telegram.php';
+require_once __DIR__ . '/../includes/notifications.php';
 
 requireDesigner();
 
@@ -72,6 +73,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['task_id'])) {
             if ($newStatus === 'delivered') {
                 $filePath = $uploadedFile ? UPLOAD_DIR . $uploadedFile : null;
                 notifyManagerTaskDelivered($currentUser['full_name'], $task['title'], $taskId, $filePath);
+
+                // In-app notification to all managers
+                notifyAllManagers(
+                    'task_delivered',
+                    __('notif_task_delivered'),
+                    $currentUser['full_name'] . ' — ' . $task['title'],
+                    '/manager/view_task.php?id=' . $taskId
+                );
             }
 
             // Check if AJAX request
