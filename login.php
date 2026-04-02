@@ -48,7 +48,7 @@ $switchLang = ($currentLang === 'en') ? 'ar' : 'en';
     <div class="login-page">
         <div class="login-card">
             <div class="login-logo">
-                <img src="/logo-white.png" alt="Logo">
+                <img src="/logo-blue.png" alt="Logo">
             </div>
             <h1 class="login-title"><?= __('login_title') ?></h1>
             <p class="login-subtitle"><?= __('login_subtitle') ?></p>
