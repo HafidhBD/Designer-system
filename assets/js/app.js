@@ -140,26 +140,49 @@ document.addEventListener('DOMContentLoaded', function() {
     var badge = document.getElementById('notifBadge');
     var list = document.getElementById('notifList');
     var markAllBtn = document.getElementById('notifMarkAll');
+    var wrapper = document.getElementById('notifWrapper');
 
-    if (!bell) return;
+    if (!bell || !dropdown) return;
+
+    var isOpen = false;
+
+    // Bell hover effect
+    bell.addEventListener('mouseenter', function() {
+        this.style.background = '#EEF2FF';
+        this.style.borderColor = '#4F46E5';
+        this.style.color = '#4F46E5';
+    });
+    bell.addEventListener('mouseleave', function() {
+        this.style.background = 'none';
+        this.style.borderColor = '#e2e8f0';
+        this.style.color = '#64748b';
+    });
 
     // Toggle dropdown
     bell.addEventListener('click', function(e) {
+        e.preventDefault();
         e.stopPropagation();
-        var isOpen = dropdown.classList.contains('open');
-        dropdown.classList.toggle('open');
-        if (!isOpen) fetchNotifications();
+        isOpen = !isOpen;
+        if (isOpen) {
+            dropdown.style.display = 'flex';
+            fetchNotifications();
+        } else {
+            dropdown.style.display = 'none';
+        }
     });
 
     // Close dropdown on outside click
     document.addEventListener('click', function(e) {
-        if (dropdown && !dropdown.contains(e.target) && e.target !== bell) {
-            dropdown.classList.remove('open');
+        if (isOpen && wrapper && !wrapper.contains(e.target)) {
+            isOpen = false;
+            dropdown.style.display = 'none';
         }
     });
 
     // Mark all as read
     if (markAllBtn) {
+        markAllBtn.addEventListener('mouseenter', function() { this.style.background = '#EEF2FF'; });
+        markAllBtn.addEventListener('mouseleave', function() { this.style.background = 'none'; });
         markAllBtn.addEventListener('click', function(e) {
             e.stopPropagation();
             fetch('/api/notifications.php?action=read_all', {
@@ -168,9 +191,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 body: ''
             }).then(function() {
                 updateBadge(0);
-                document.querySelectorAll('.notif-item.unread').forEach(function(el) {
-                    el.classList.remove('unread');
-                });
+                var items = list.querySelectorAll('[data-nid]');
+                items.forEach(function(el) { el.style.background = '#fff'; });
             });
         });
     }
@@ -183,7 +205,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 updateBadge(data.unread || 0);
                 renderNotifications(data.notifications || []);
             })
-            .catch(function() {});
+            .catch(function(err) {
+                list.innerHTML = '<div style="padding:30px 16px;text-align:center;color:#ef4444;font-size:0.85rem;">Error loading notifications</div>';
+            });
     }
 
     // Poll for unread count every 30 seconds
@@ -194,13 +218,21 @@ document.addEventListener('DOMContentLoaded', function() {
                 var newCount = data.count || 0;
                 var oldCount = parseInt(badge.textContent) || 0;
                 updateBadge(newCount);
-                // Play subtle animation if new notifications arrived
                 if (newCount > oldCount && newCount > 0) {
-                    bell.classList.add('notif-shake');
-                    setTimeout(function() { bell.classList.remove('notif-shake'); }, 600);
+                    shakeBell();
                 }
             })
             .catch(function() {});
+    }
+
+    function shakeBell() {
+        var frames = [0, 14, -14, 8, -8, 0];
+        var i = 0;
+        var interval = setInterval(function() {
+            bell.style.transform = 'rotate(' + frames[i] + 'deg)';
+            i++;
+            if (i >= frames.length) { clearInterval(interval); bell.style.transform = ''; }
+        }, 80);
     }
 
     function updateBadge(count) {
@@ -213,30 +245,40 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function renderNotifications(items) {
+        var emptyText = list.getAttribute('data-empty') || 'No notifications';
         if (!items.length) {
-            list.innerHTML = '<div class="notif-empty">' + (list.dataset.empty || 'No notifications') + '</div>';
+            list.innerHTML = '<div style="padding:40px 16px;text-align:center;color:#94a3b8;font-size:0.88rem;">' +
+                '<svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#cbd5e1" stroke-width="1.5" style="margin:0 auto 10px;display:block;"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>' +
+                emptyText + '</div>';
             return;
         }
         var html = '';
         items.forEach(function(n) {
-            var cls = n.is_read ? 'notif-item' : 'notif-item unread';
+            var bg = n.is_read ? '#fff' : '#EEF2FF';
             var link = n.link || '#';
-            html += '<a href="' + link + '" class="' + cls + '" data-id="' + n.id + '">';
-            html += '  <div class="notif-icon">' + n.icon + '</div>';
-            html += '  <div class="notif-content">';
-            html += '    <div class="notif-title">' + escHtml(n.title) + '</div>';
-            html += '    <div class="notif-message">' + escHtml(n.message) + '</div>';
-            html += '    <div class="notif-time">' + escHtml(n.time) + '</div>';
-            html += '  </div>';
-            html += '</a>';
+            html += '<a href="' + link + '" data-nid="' + n.id + '" data-read="' + n.is_read + '" style="display:flex;gap:10px;padding:12px 16px;border-bottom:1px solid #f1f5f9;text-decoration:none;color:inherit;background:' + bg + ';transition:background 0.2s;">';
+            html += '<div style="font-size:1.4rem;flex-shrink:0;width:36px;height:36px;display:flex;align-items:center;justify-content:center;background:#f8fafc;border-radius:50%;">' + n.icon + '</div>';
+            html += '<div style="flex:1;min-width:0;overflow:hidden;">';
+            html += '<div style="font-size:0.84rem;font-weight:600;color:#1e293b;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + escHtml(n.title) + '</div>';
+            html += '<div style="font-size:0.78rem;color:#64748b;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px;">' + escHtml(n.message) + '</div>';
+            html += '<div style="font-size:0.7rem;color:#94a3b8;margin-top:3px;">' + escHtml(n.time) + '</div>';
+            html += '</div></a>';
         });
         list.innerHTML = html;
 
         // Click handler to mark as read
-        list.querySelectorAll('.notif-item').forEach(function(el) {
+        list.querySelectorAll('[data-nid]').forEach(function(el) {
+            el.addEventListener('mouseenter', function() {
+                this.style.background = this.getAttribute('data-read') === '0' ? '#dde4ff' : '#f8fafc';
+            });
+            el.addEventListener('mouseleave', function() {
+                this.style.background = this.getAttribute('data-read') === '0' ? '#EEF2FF' : '#fff';
+            });
             el.addEventListener('click', function() {
-                var nid = this.getAttribute('data-id');
-                if (nid && this.classList.contains('unread')) {
+                var nid = this.getAttribute('data-nid');
+                if (nid && this.getAttribute('data-read') === '0') {
+                    this.setAttribute('data-read', '1');
+                    this.style.background = '#fff';
                     fetch('/api/notifications.php?action=read', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },

@@ -57,20 +57,23 @@ $langSwitchUrl .= '?' . http_build_query($queryParams);
                 <a href="<?= $langSwitchUrl ?>" class="btn btn-sm btn-outline lang-switch"><?= __('nav_language') ?></a>
 
                 <!-- Notification Bell -->
-                <div class="notif-wrapper" id="notifWrapper">
-                    <button class="notif-bell" id="notifBell" aria-label="<?= __('notifications') ?>">
-                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
-                        <span class="notif-badge" id="notifBadge" style="display:none;">0</span>
+                <div class="notif-wrapper" id="notifWrapper" style="position:relative;">
+                    <button class="notif-bell" id="notifBell" type="button" title="<?= __('notifications') ?>" style="background:none;border:1px solid #e2e8f0;cursor:pointer;position:relative;width:38px;height:38px;border-radius:50%;color:#64748b;display:flex;align-items:center;justify-content:center;transition:all 0.2s ease;">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
+                        <span id="notifBadge" style="display:none;position:absolute;top:-2px;right:-2px;background:#EF4444;color:#fff;font-size:0.6rem;font-weight:700;min-width:18px;height:18px;border-radius:9px;align-items:center;justify-content:center;padding:0 4px;line-height:1;border:2px solid #fff;">0</span>
                     </button>
-                    <div class="notif-dropdown" id="notifDropdown">
-                        <div class="notif-header">
-                            <strong><?= __('notifications') ?></strong>
-                            <button class="notif-mark-all" id="notifMarkAll"><?= __('mark_all_read') ?></button>
+                    <div id="notifDropdown" style="display:none;position:absolute;top:calc(100% + 8px);<?= $dir === 'rtl' ? 'left:0;' : 'right:0;' ?>width:360px;max-height:480px;background:#fff;border:1px solid #e2e8f0;border-radius:12px;box-shadow:0 10px 25px rgba(0,0,0,0.12),0 4px 10px rgba(0,0,0,0.08);z-index:9999;overflow:hidden;flex-direction:column;">
+                        <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid #e2e8f0;">
+                            <strong style="font-size:0.95rem;color:#1e293b;"><?= __('notifications') ?></strong>
+                            <button id="notifMarkAll" type="button" style="background:none;border:none;color:#4F46E5;font-size:0.78rem;cursor:pointer;padding:4px 10px;border-radius:4px;transition:all 0.2s;"><?= __('mark_all_read') ?></button>
                         </div>
-                        <div class="notif-list" id="notifList">
-                            <div class="notif-empty"><?= __('no_notifications') ?></div>
+                        <div id="notifList" style="overflow-y:auto;max-height:340px;" data-empty="<?= __('no_notifications') ?>">
+                            <div style="padding:40px 16px;text-align:center;color:#94a3b8;font-size:0.88rem;">
+                                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#cbd5e1" stroke-width="1.5" style="margin:0 auto 10px;display:block;"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
+                                <?= __('no_notifications') ?>
+                            </div>
                         </div>
-                        <a href="/notifications.php" class="notif-footer"><?= __('view_all_notifications') ?></a>
+                        <a href="/notifications.php" style="display:block;text-align:center;padding:12px;font-size:0.82rem;font-weight:600;color:#4F46E5;border-top:1px solid #e2e8f0;text-decoration:none;transition:all 0.2s;"><?= __('view_all_notifications') ?></a>
                     </div>
                 </div>
 

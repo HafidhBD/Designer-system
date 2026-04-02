@@ -8,21 +8,30 @@
  * Create a notification for a user
  */
 function createNotification($userId, $type, $title, $message, $link = null) {
-    $pdo = getDBConnection();
-    $stmt = $pdo->prepare("INSERT INTO notifications (user_id, type, title, message, link) VALUES (?, ?, ?, ?, ?)");
-    $stmt->execute([$userId, $type, $title, $message, $link]);
-    return $pdo->lastInsertId();
+    try {
+        $pdo = getDBConnection();
+        $stmt = $pdo->prepare("INSERT INTO notifications (user_id, type, title, message, link) VALUES (?, ?, ?, ?, ?)");
+        $stmt->execute([$userId, $type, $title, $message, $link]);
+        return $pdo->lastInsertId();
+    } catch (PDOException $e) {
+        // Table may not exist yet — fail silently
+        return false;
+    }
 }
 
 /**
  * Create notifications for all managers
  */
 function notifyAllManagers($type, $title, $message, $link = null) {
-    $pdo = getDBConnection();
-    $stmt = $pdo->query("SELECT id FROM users WHERE role = 'manager'");
-    $managers = $stmt->fetchAll();
-    foreach ($managers as $m) {
-        createNotification($m['id'], $type, $title, $message, $link);
+    try {
+        $pdo = getDBConnection();
+        $stmt = $pdo->query("SELECT id FROM users WHERE role = 'manager'");
+        $managers = $stmt->fetchAll();
+        foreach ($managers as $m) {
+            createNotification($m['id'], $type, $title, $message, $link);
+        }
+    } catch (PDOException $e) {
+        // Table may not exist yet — fail silently
     }
 }
 

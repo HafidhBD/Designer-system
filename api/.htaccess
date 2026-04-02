@@ -1,0 +1,5 @@
+# Allow PHP execution in api directory
+# But block direct access to non-PHP files
+<FilesMatch "^(?!.*\.php$)">
+    Deny from all
+</FilesMatch>
