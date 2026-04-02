@@ -37,7 +37,7 @@ CREATE TABLE IF NOT EXISTS `tasks` (
     `assigned_to` INT UNSIGNED NOT NULL,
     `progress_percentage` TINYINT UNSIGNED NOT NULL DEFAULT 0,
     `status` ENUM('new', 'in_progress', 'delivered') NOT NULL DEFAULT 'new',
-    `file_path` VARCHAR(500) NULL DEFAULT NULL,
+    `file_path` TEXT NULL DEFAULT NULL,
     `created_by` INT UNSIGNED NOT NULL,
     `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     `updated_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,

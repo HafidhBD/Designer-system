@@ -150,7 +150,7 @@ $lang = [
     'password_min'      => 'يجب أن تكون كلمة المرور 6 أحرف على الأقل',
 
     // File Upload
-    'upload_design'     => 'رفع ملف التصميم',
+    'upload_design'     => 'رفع ملفات التصميم',
     'upload_required'   => 'يجب رفع ملف التصميم عند تحويل الحالة إلى تم التسليم',
     'upload_file'       => 'ملف التصميم',
     'upload_success'    => 'تم رفع الملف بنجاح',
@@ -161,6 +161,8 @@ $lang = [
     'design_file'       => 'ملف التصميم',
     'no_file_uploaded'  => 'لم يتم رفع ملف تصميم بعد',
     'view_file'         => 'عرض / تحميل الملف',
+    'uploaded_files'    => 'الملفات المرفوعة',
+    'upload_hint_multiple' => 'يمكنك اختيار عدة ملفات. المسموح: JPG, PNG, GIF, PDF, AI, PSD, SVG, EPS, ZIP, RAR, MP4, MOV, WEBP (الحد الأقصى 20 ميجا لكل ملف)',
 
     // Telegram
     'telegram_chat_id'  => 'معرّف تيليجرام (Chat ID)',

@@ -127,24 +127,36 @@ include __DIR__ . '/../templates/header.php';
     </div>
     <?php endif; ?>
 
-    <!-- Design File -->
+    <!-- Design Files -->
     <div class="mt-2" style="border-top:1px solid var(--border);padding-top:16px;">
-        <div class="detail-label"><?= __('design_file') ?></div>
+        <div class="detail-label"><?= __('uploaded_files') ?></div>
         <div class="detail-value">
-            <?php if (!empty($task['file_path'])): ?>
-                <?php
-                    $fileUrl = UPLOAD_URL . $task['file_path'];
-                    $fileExt = strtolower(pathinfo($task['file_path'], PATHINFO_EXTENSION));
+            <?php if (!empty($task['file_path'])):
+                $taskFiles = json_decode($task['file_path'], true);
+                if (!is_array($taskFiles)) $taskFiles = [$task['file_path']];
+            ?>
+                <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;margin-bottom:12px;">
+                <?php foreach ($taskFiles as $fi => $fileName):
+                    $fileUrl = UPLOAD_URL . $fileName;
+                    $fileExt = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
                     $isImage = in_array($fileExt, ['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg']);
                 ?>
-                <?php if ($isImage): ?>
-                <div class="mb-2">
-                    <img src="<?= sanitize($fileUrl) ?>" alt="Design" style="max-width:100%;max-height:400px;border-radius:8px;border:1px solid var(--border);">
+                    <div style="border:1px solid var(--border);border-radius:8px;overflow:hidden;">
+                        <?php if ($isImage): ?>
+                        <a href="<?= sanitize($fileUrl) ?>" target="_blank">
+                            <img src="<?= sanitize($fileUrl) ?>" alt="Design <?= $fi+1 ?>" style="width:100%;height:150px;object-fit:cover;">
+                        </a>
+                        <?php else: ?>
+                        <div style="height:80px;display:flex;align-items:center;justify-content:center;background:#f8fafc;font-size:2rem;">📄</div>
+                        <?php endif; ?>
+                        <div style="padding:8px;font-size:0.8rem;">
+                            <a href="<?= sanitize($fileUrl) ?>" target="_blank" download style="color:var(--primary);word-break:break-all;">
+                                📎 <?= sanitize($fileName) ?>
+                            </a>
+                        </div>
+                    </div>
+                <?php endforeach; ?>
                 </div>
-                <?php endif; ?>
-                <a href="<?= sanitize($fileUrl) ?>" target="_blank" class="btn btn-sm btn-primary" download>
-                    📎 <?= __('download_file') ?> (<?= sanitize($task['file_path']) ?>)
-                </a>
             <?php else: ?>
                 <span style="color:var(--text-secondary);"><?= __('no_file_uploaded') ?></span>
             <?php endif; ?>

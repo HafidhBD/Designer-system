@@ -180,8 +180,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['install'])) {
             try {
                 $cols = $pdo->query("SHOW COLUMNS FROM tasks LIKE 'file_path'")->rowCount();
                 if ($cols == 0) {
-                    $pdo->exec("ALTER TABLE `tasks` ADD COLUMN `file_path` VARCHAR(500) NULL DEFAULT NULL AFTER `status`");
+                    $pdo->exec("ALTER TABLE `tasks` ADD COLUMN `file_path` TEXT NULL DEFAULT NULL AFTER `status`");
                     $messages[] = "Column <strong>file_path</strong> added to tasks.";
+                } else {
+                    // Upgrade existing VARCHAR to TEXT for multi-file support
+                    $colInfo = $pdo->query("SHOW COLUMNS FROM tasks LIKE 'file_path'")->fetch();
+                    if ($colInfo && stripos($colInfo['Type'], 'varchar') !== false) {
+                        $pdo->exec("ALTER TABLE `tasks` MODIFY COLUMN `file_path` TEXT NULL DEFAULT NULL");
+                        $messages[] = "Column <strong>file_path</strong> upgraded to TEXT for multi-file support.";
+                    }
                 }
             } catch (PDOException $e) { /* column may already exist */ }
 
@@ -245,7 +252,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['install'])) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Install — Design Task Manager</title>
-    <link rel="icon" href="/logo.gif" type="image/gif">
+    <link rel="icon" href="/logo-wihte.png" type="image/png">
     <style>
         *{margin:0;padding:0;box-sizing:border-box}
         body{font-family:'Segoe UI',-apple-system,BlinkMacSystemFont,Arial,sans-serif;background:linear-gradient(135deg,#1E293B 0%,#334155 50%,#1E293B 100%);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;color:#1E293B}
@@ -289,7 +296,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['install'])) {
 <body>
 <div class="card">
     <div class="hdr">
-        <img src="/logo.gif" alt="Logo">
+        <img src="/logo-wihte.png" alt="Logo">
         <h1>Design Task Manager — Installer</h1>
         <p>Automated database setup & system installation</p>
     </div>

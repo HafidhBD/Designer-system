@@ -150,7 +150,7 @@ $lang = [
     'password_min'      => 'Password must be at least 6 characters',
 
     // File Upload
-    'upload_design'     => 'Upload Design File',
+    'upload_design'     => 'Upload Design Files',
     'upload_required'   => 'You must upload the design file when marking as delivered',
     'upload_file'       => 'Design File',
     'upload_success'    => 'File uploaded successfully',
@@ -161,6 +161,8 @@ $lang = [
     'design_file'       => 'Design File',
     'no_file_uploaded'  => 'No design file uploaded yet',
     'view_file'         => 'View / Download File',
+    'uploaded_files'    => 'Uploaded Files',
+    'upload_hint_multiple' => 'You can select multiple files. Allowed: JPG, PNG, GIF, PDF, AI, PSD, SVG, EPS, ZIP, RAR, MP4, MOV, WEBP (max 20MB each)',
 
     // Telegram
     'telegram_chat_id'  => 'Telegram Chat ID',

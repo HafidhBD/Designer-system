@@ -21,7 +21,7 @@ $langSwitchUrl .= '?' . http_build_query($queryParams);
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= sanitize($htmlTitle) ?></title>
-    <link rel="icon" href="/logo.gif" type="image/gif">
+    <link rel="icon" href="/logo-wihte.png" type="image/png">
     <link rel="stylesheet" href="/assets/css/style.css">
     <?php if ($dir === 'rtl'): ?>
     <link rel="stylesheet" href="/assets/css/rtl.css">
@@ -36,7 +36,7 @@ $langSwitchUrl .= '?' . http_build_query($queryParams);
             <span></span><span></span><span></span>
         </button>
         <div class="mobile-logo">
-            <img src="/logo.gif" alt="Logo" class="logo-img-sm">
+            <img src="/logo-wihte.png" alt="Logo" class="logo-img-sm">
         </div>
         <a href="<?= $langSwitchUrl ?>" class="lang-toggle-mobile"><?= __('nav_language') ?></a>
     </div>

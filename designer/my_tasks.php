@@ -39,27 +39,44 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['task_id'])) {
             }
 
             // If delivering, file upload is required
-            $uploadedFile = null;
+            $uploadedFiles = [];
             if ($newStatus === 'delivered') {
-                if (empty($_FILES['design_file']) || $_FILES['design_file']['error'] === UPLOAD_ERR_NO_FILE) {
+                // Check if any files were uploaded
+                $hasFiles = !empty($_FILES['design_files']) && is_array($_FILES['design_files']['name']);
+                $anyFile = false;
+                if ($hasFiles) {
+                    foreach ($_FILES['design_files']['error'] as $err) {
+                        if ($err !== UPLOAD_ERR_NO_FILE) { $anyFile = true; break; }
+                    }
+                }
+                if (!$anyFile) {
                     setFlash('error', __('upload_required'));
                     header('Location: /designer/my_tasks.php?update=' . $taskId);
                     exit;
                 }
-                $uploadResult = handleDesignUpload($_FILES['design_file'], $taskId);
+                $uploadResult = handleMultipleDesignUploads($_FILES['design_files'], $taskId);
                 if (!$uploadResult['success']) {
                     setFlash('error', $uploadResult['error']);
                     header('Location: /designer/my_tasks.php?update=' . $taskId);
                     exit;
                 }
-                $uploadedFile = $uploadResult['filename'];
+                $uploadedFiles = $uploadResult['filenames'];
                 $progress = 100;
             }
 
             // Update task
-            if ($uploadedFile) {
+            if (!empty($uploadedFiles)) {
+                // Merge with existing files if any
+                $existingFiles = [];
+                if (!empty($task['file_path'])) {
+                    $decoded = json_decode($task['file_path'], true);
+                    $existingFiles = is_array($decoded) ? $decoded : [$task['file_path']];
+                }
+                $allFiles = array_merge($existingFiles, $uploadedFiles);
+                $filePathJson = json_encode($allFiles);
+
                 $updateStmt = $pdo->prepare("UPDATE tasks SET status = ?, progress_percentage = ?, file_path = ?, updated_at = NOW() WHERE id = ?");
-                $updateStmt->execute([$newStatus, $progress, $uploadedFile, $taskId]);
+                $updateStmt->execute([$newStatus, $progress, $filePathJson, $taskId]);
             } else {
                 $updateStmt = $pdo->prepare("UPDATE tasks SET status = ?, progress_percentage = ?, updated_at = NOW() WHERE id = ?");
                 $updateStmt->execute([$newStatus, $progress, $taskId]);
@@ -71,8 +88,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['task_id'])) {
 
             // Notify manager via Telegram when task is delivered
             if ($newStatus === 'delivered') {
-                $filePath = $uploadedFile ? UPLOAD_DIR . $uploadedFile : null;
-                notifyManagerTaskDelivered($currentUser['full_name'], $task['title'], $taskId, $filePath);
+                // Send first uploaded file via Telegram (or null)
+                $firstFilePath = !empty($uploadedFiles) ? UPLOAD_DIR . $uploadedFiles[0] : null;
+                notifyManagerTaskDelivered($currentUser['full_name'], $task['title'], $taskId, $firstFilePath);
+                // Send additional files via Telegram
+                if (count($uploadedFiles) > 1) {
+                    $pdo2 = getDBConnection();
+                    $mgrStmt = $pdo2->query("SELECT telegram_chat_id FROM users WHERE role = 'manager' AND telegram_chat_id IS NOT NULL AND telegram_chat_id != ''");
+                    $mgrs = $mgrStmt->fetchAll();
+                    for ($fi = 1; $fi < count($uploadedFiles); $fi++) {
+                        $fp = UPLOAD_DIR . $uploadedFiles[$fi];
+                        if (file_exists($fp)) {
+                            foreach ($mgrs as $mgr) {
+                                sendTelegramDocument($mgr['telegram_chat_id'], $fp, "📎 " . $task['title'] . " (" . ($fi+1) . "/" . count($uploadedFiles) . ")");
+                            }
+                        }
+                    }
+                }
 
                 // In-app notification to all managers
                 notifyAllManagers(
@@ -293,13 +325,23 @@ include __DIR__ . '/../templates/header.php';
 
                 <!-- Design File Upload (shown only when status = delivered) -->
                 <div class="form-group" id="uploadField" style="display:<?= $updateTask['status'] === 'delivered' ? 'block' : 'none' ?>;">
-                    <label class="form-label" for="design_file"><?= __('upload_design') ?> *</label>
-                    <input type="file" id="design_file" name="design_file" class="form-control"
+                    <label class="form-label" for="design_files"><?= __('upload_design') ?> *</label>
+                    <input type="file" id="design_files" name="design_files[]" class="form-control" multiple
                            accept=".jpg,.jpeg,.png,.gif,.pdf,.ai,.psd,.svg,.eps,.zip,.rar,.mp4,.mov,.webp">
-                    <span class="form-hint"><?= __('upload_required') ?></span>
-                    <?php if (!empty($updateTask['file_path'])): ?>
+                    <span class="form-hint"><?= __('upload_hint_multiple') ?></span>
+                    <?php
+                    // Show existing uploaded files
+                    if (!empty($updateTask['file_path'])):
+                        $existFiles = json_decode($updateTask['file_path'], true);
+                        if (!is_array($existFiles)) $existFiles = [$updateTask['file_path']];
+                    ?>
                     <div class="mt-1" style="font-size:0.85rem;color:var(--text-secondary);">
-                        📎 <?= __('design_file') ?>: <a href="<?= UPLOAD_URL . sanitize($updateTask['file_path']) ?>" target="_blank"><?= sanitize($updateTask['file_path']) ?></a>
+                        <strong>📎 <?= __('uploaded_files') ?>:</strong>
+                        <?php foreach ($existFiles as $idx => $ef): ?>
+                        <div style="margin:4px 0;">
+                            <?= ($idx + 1) ?>. <a href="<?= UPLOAD_URL . sanitize($ef) ?>" target="_blank" style="color:var(--primary);"><?= sanitize($ef) ?></a>
+                        </div>
+                        <?php endforeach; ?>
                     </div>
                     <?php endif; ?>
                 </div>

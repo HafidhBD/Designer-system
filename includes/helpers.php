@@ -189,3 +189,69 @@ function handleDesignUpload($file, $taskId) {
 
     return ['success' => false, 'error' => __('upload_error')];
 }
+
+/**
+ * Handle multiple file uploads for design delivery
+ * Returns array of filenames or error
+ */
+function handleMultipleDesignUploads($files, $taskId) {
+    // Normalize $_FILES array for multiple uploads
+    $fileCount = is_array($files['name']) ? count($files['name']) : 0;
+    if ($fileCount === 0) {
+        return ['success' => false, 'error' => __('upload_required')];
+    }
+
+    // Check if at least one file was actually uploaded
+    $hasFile = false;
+    for ($i = 0; $i < $fileCount; $i++) {
+        if ($files['error'][$i] !== UPLOAD_ERR_NO_FILE) {
+            $hasFile = true;
+            break;
+        }
+    }
+    if (!$hasFile) {
+        return ['success' => false, 'error' => __('upload_required')];
+    }
+
+    $uploadedFiles = [];
+    $errors = [];
+
+    for ($i = 0; $i < $fileCount; $i++) {
+        if ($files['error'][$i] === UPLOAD_ERR_NO_FILE) continue;
+
+        if ($files['error'][$i] !== UPLOAD_ERR_OK) {
+            $errors[] = $files['name'][$i] . ': ' . __('upload_error');
+            continue;
+        }
+
+        if ($files['size'][$i] > MAX_UPLOAD_SIZE) {
+            $errors[] = $files['name'][$i] . ': ' . __('upload_too_large');
+            continue;
+        }
+
+        $ext = strtolower(pathinfo($files['name'][$i], PATHINFO_EXTENSION));
+        if (!in_array($ext, ALLOWED_EXTENSIONS)) {
+            $errors[] = $files['name'][$i] . ': ' . __('upload_invalid');
+            continue;
+        }
+
+        if (!is_dir(UPLOAD_DIR)) {
+            mkdir(UPLOAD_DIR, 0755, true);
+        }
+
+        $newName = 'task_' . $taskId . '_' . time() . '_' . bin2hex(random_bytes(4)) . '.' . $ext;
+        $destPath = UPLOAD_DIR . $newName;
+
+        if (move_uploaded_file($files['tmp_name'][$i], $destPath)) {
+            $uploadedFiles[] = $newName;
+        } else {
+            $errors[] = $files['name'][$i] . ': ' . __('upload_error');
+        }
+    }
+
+    if (empty($uploadedFiles)) {
+        return ['success' => false, 'error' => implode("\n", $errors)];
+    }
+
+    return ['success' => true, 'filenames' => $uploadedFiles, 'errors' => $errors];
+}

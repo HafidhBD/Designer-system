@@ -8,7 +8,7 @@ $currentDir = basename(dirname($_SERVER['PHP_SELF']));
 <aside class="sidebar" id="sidebar">
     <div class="sidebar-header">
         <a href="/index.php" class="sidebar-brand">
-            <img src="/logo.gif" alt="Logo" class="logo-img">
+            <img src="/logo-wihte.png" alt="Logo" class="logo-img">
         </a>
     </div>
     <nav class="sidebar-nav">
