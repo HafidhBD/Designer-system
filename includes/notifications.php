@@ -25,7 +25,7 @@ function createNotification($userId, $type, $title, $message, $link = null) {
 function notifyAllManagers($type, $title, $message, $link = null) {
     try {
         $pdo = getDBConnection();
-        $stmt = $pdo->query("SELECT id FROM users WHERE role = 'manager'");
+        $stmt = $pdo->query("SELECT id FROM users WHERE role IN ('manager','supervisor')");
         $managers = $stmt->fetchAll();
         foreach ($managers as $m) {
             createNotification($m['id'], $type, $title, $message, $link);

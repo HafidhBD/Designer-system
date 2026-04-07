@@ -112,7 +112,7 @@ function notifyDesignerNewTask($designerId, $taskTitle, $clientName, $designType
  */
 function notifyManagerTaskDelivered($designerName, $taskTitle, $taskId, $filePath = null) {
     $pdo = getDBConnection();
-    $stmt = $pdo->query("SELECT id, telegram_chat_id, language_preference FROM users WHERE role = 'manager' AND telegram_chat_id IS NOT NULL AND telegram_chat_id != ''");
+    $stmt = $pdo->query("SELECT id, telegram_chat_id, language_preference FROM users WHERE role IN ('manager','supervisor') AND telegram_chat_id IS NOT NULL AND telegram_chat_id != ''");
     $managers = $stmt->fetchAll();
 
     foreach ($managers as $manager) {
