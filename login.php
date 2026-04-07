@@ -5,9 +5,16 @@
 require_once __DIR__ . '/includes/auth.php';
 require_once __DIR__ . '/includes/helpers.php';
 
-// If already logged in, redirect
+// If already logged in, redirect based on role
 if (isLoggedIn()) {
-    header('Location: /index.php');
+    if (isManager() || isSupervisor()) {
+        header('Location: /manager/dashboard.php');
+    } elseif (isDesigner()) {
+        header('Location: /designer/dashboard.php');
+    } else {
+        // Unknown role — force logout to prevent loops
+        header('Location: /logout.php');
+    }
     exit;
 }
 

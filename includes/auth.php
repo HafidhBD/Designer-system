@@ -69,7 +69,13 @@ function requireLogin() {
 function requireManager() {
     requireLogin();
     if (!isManager()) {
-        header('Location: /index.php');
+        if (isSupervisor()) {
+            header('Location: /manager/dashboard.php');
+        } elseif (isDesigner()) {
+            header('Location: /designer/dashboard.php');
+        } else {
+            header('Location: /login.php');
+        }
         exit;
     }
 }
@@ -80,7 +86,11 @@ function requireManager() {
 function requireDesigner() {
     requireLogin();
     if (!isDesigner()) {
-        header('Location: /index.php');
+        if (isManager() || isSupervisor()) {
+            header('Location: /manager/dashboard.php');
+        } else {
+            header('Location: /login.php');
+        }
         exit;
     }
 }
@@ -91,7 +101,11 @@ function requireDesigner() {
 function requireManagerOrSupervisor() {
     requireLogin();
     if (!isManager() && !isSupervisor()) {
-        header('Location: /index.php');
+        if (isDesigner()) {
+            header('Location: /designer/dashboard.php');
+        } else {
+            header('Location: /login.php');
+        }
         exit;
     }
 }
