@@ -79,7 +79,7 @@ $langSwitchUrl .= '?' . http_build_query($queryParams);
 
                 <div class="user-info">
                     <span class="user-name"><?= sanitize($currentUser['full_name']) ?></span>
-                    <span class="user-role badge badge-role"><?= isManager() ? __('role_manager') : __('role_designer') ?></span>
+                    <span class="user-role badge badge-role"><?= isManager() ? __('role_manager') : (isSupervisor() ? __('role_supervisor') : __('role_designer')) ?></span>
                 </div>
                 <a href="/logout.php" class="btn btn-sm btn-danger"><?= __('logout') ?></a>
             </div>

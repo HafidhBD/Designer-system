@@ -5,7 +5,7 @@
 require_once __DIR__ . '/../includes/auth.php';
 require_once __DIR__ . '/../includes/helpers.php';
 
-requireManager();
+requireManagerOrSupervisor();
 
 $pageTitle = __('nav_all_tasks');
 
@@ -127,14 +127,14 @@ include __DIR__ . '/../templates/header.php';
 <div class="card">
     <div class="card-header">
         <h2 class="card-title"><?= __('tasks') ?> (<?= count($tasks) ?>)</h2>
-        <a href="/manager/create_task.php" class="btn btn-sm btn-primary"><?= __('create_new_task') ?></a>
+        <?php if (isManager()): ?><a href="/manager/create_task.php" class="btn btn-sm btn-primary"><?= __('create_new_task') ?></a><?php endif; ?>
     </div>
 
     <?php if (empty($tasks)): ?>
     <div class="empty-state">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
         <p><?= __('no_tasks') ?></p>
-        <a href="/manager/create_task.php" class="btn btn-primary"><?= __('create_new_task') ?></a>
+        <?php if (isManager()): ?><a href="/manager/create_task.php" class="btn btn-primary"><?= __('create_new_task') ?></a><?php endif; ?>
     </div>
     <?php else: ?>
     <div class="table-wrapper">
@@ -179,6 +179,7 @@ include __DIR__ . '/../templates/header.php';
                     </td>
                     <td><span class="badge <?= getStatusClass($task['status']) ?>"><?= getStatusLabel($task['status']) ?></span></td>
                     <td class="text-small text-muted"><?= formatDateTime($task['created_at']) ?></td>
+                    <?php if (isManager()): ?>
                     <td>
                         <div class="btn-group">
                             <a href="/manager/view_task.php?id=<?= $task['id'] ?>" class="btn btn-sm btn-outline"><?= __('view') ?></a>
@@ -188,6 +189,9 @@ include __DIR__ . '/../templates/header.php';
                                data-confirm="<?= __('confirm_delete') ?>"><?= __('delete') ?></a>
                         </div>
                     </td>
+                    <?php else: ?>
+                    <td><a href="/manager/view_task.php?id=<?= $task['id'] ?>" class="btn btn-sm btn-outline"><?= __('view') ?></a></td>
+                    <?php endif; ?>
                 </tr>
                 <?php endforeach; ?>
             </tbody>

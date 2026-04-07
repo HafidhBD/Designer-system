@@ -8,7 +8,7 @@ require_once __DIR__ . '/includes/helpers.php';
 
 requireLogin();
 
-if (isManager()) {
+if (isManager() || isSupervisor()) {
     header('Location: /manager/dashboard.php');
 } else {
     header('Location: /designer/dashboard.php');

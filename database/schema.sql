@@ -15,7 +15,7 @@ CREATE TABLE IF NOT EXISTS `users` (
     `full_name` VARCHAR(100) NOT NULL,
     `email` VARCHAR(150) NOT NULL,
     `password` VARCHAR(255) NOT NULL,
-    `role` ENUM('manager', 'designer') NOT NULL DEFAULT 'designer',
+    `role` ENUM('manager', 'designer', 'supervisor') NOT NULL DEFAULT 'designer',
     `language_preference` ENUM('en', 'ar') NOT NULL DEFAULT 'en',
     `telegram_chat_id` VARCHAR(50) NULL DEFAULT NULL,
     `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,

@@ -5,7 +5,7 @@
 require_once __DIR__ . '/../includes/auth.php';
 require_once __DIR__ . '/../includes/helpers.php';
 
-requireManager();
+requireManagerOrSupervisor();
 
 $taskId = (int)($_GET['id'] ?? 0);
 if (!$taskId) {
@@ -50,7 +50,7 @@ include __DIR__ . '/../templates/header.php';
     <div class="card-header">
         <h2 class="card-title"><?= sanitize($task['title']) ?></h2>
         <div class="btn-group">
-            <a href="/manager/edit_task.php?id=<?= $task['id'] ?>" class="btn btn-sm btn-primary"><?= __('edit') ?></a>
+            <?php if (isManager()): ?><a href="/manager/edit_task.php?id=<?= $task['id'] ?>" class="btn btn-sm btn-primary"><?= __('edit') ?></a><?php endif; ?>
             <a href="/manager/all_tasks.php" class="btn btn-sm btn-outline"><?= __('back') ?></a>
         </div>
     </div>

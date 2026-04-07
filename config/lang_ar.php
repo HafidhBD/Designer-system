@@ -134,6 +134,7 @@ $lang = [
     'role'              => 'الدور',
     'role_manager'      => 'مدير',
     'role_designer'     => 'مصمم',
+    'role_supervisor'   => 'مشرف',
     'new_password'      => 'كلمة مرور جديدة',
     'leave_blank'       => 'اتركها فارغة للاحتفاظ بكلمة المرور الحالية',
     'user_created'      => 'تم إنشاء المستخدم بنجاح',

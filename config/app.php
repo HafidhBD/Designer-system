@@ -14,6 +14,7 @@ define('SESSION_LIFETIME', 3600); // 1 hour
 // User roles
 define('ROLE_MANAGER', 'manager');
 define('ROLE_DESIGNER', 'designer');
+define('ROLE_SUPERVISOR', 'supervisor');
 
 // Task statuses
 define('STATUS_NEW', 'new');

@@ -95,7 +95,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['install'])) {
                     `full_name` VARCHAR(100) NOT NULL,
                     `email` VARCHAR(150) NOT NULL,
                     `password` VARCHAR(255) NOT NULL,
-                    `role` ENUM('manager', 'designer') NOT NULL DEFAULT 'designer',
+                    `role` ENUM('manager', 'designer', 'supervisor') NOT NULL DEFAULT 'designer',
                     `language_preference` ENUM('en', 'ar') NOT NULL DEFAULT 'en',
                     `telegram_chat_id` VARCHAR(50) NULL DEFAULT NULL,
                     `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -176,6 +176,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['install'])) {
                     $messages[] = "Column <strong>telegram_chat_id</strong> added to users.";
                 }
             } catch (PDOException $e) { /* column may already exist */ }
+
+            // Upgrade role ENUM to include supervisor
+            try {
+                $colInfo = $pdo->query("SHOW COLUMNS FROM users LIKE 'role'")->fetch();
+                if ($colInfo && stripos($colInfo['Type'], 'supervisor') === false) {
+                    $pdo->exec("ALTER TABLE `users` MODIFY COLUMN `role` ENUM('manager','designer','supervisor') NOT NULL DEFAULT 'designer'");
+                    $messages[] = "Column <strong>role</strong> upgraded to include supervisor.";
+                }
+            } catch (PDOException $e) { /* ignore */ }
 
             try {
                 $cols = $pdo->query("SHOW COLUMNS FROM tasks LIKE 'file_path'")->rowCount();

@@ -52,7 +52,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Validation
     if (empty($fullName)) $errors[] = __('full_name') . ': ' . __('required_field');
     if (empty($email) || !filter_var($email, FILTER_VALIDATE_EMAIL)) $errors[] = __('email') . ': ' . __('invalid_email');
-    if (!in_array($role, [ROLE_MANAGER, ROLE_DESIGNER])) $role = ROLE_DESIGNER;
+    if (!in_array($role, [ROLE_MANAGER, ROLE_DESIGNER, ROLE_SUPERVISOR])) $role = ROLE_DESIGNER;
 
     // Check email uniqueness
     if (empty($errors)) {
@@ -150,6 +150,7 @@ include __DIR__ . '/../templates/header.php';
                 <select id="role" name="role" class="form-control" required>
                     <option value="<?= ROLE_DESIGNER ?>" <?= (isset($editUser) && $editUser['role'] === ROLE_DESIGNER) || (!isset($editUser) && ($role ?? '') === ROLE_DESIGNER) ? 'selected' : '' ?>><?= __('role_designer') ?></option>
                     <option value="<?= ROLE_MANAGER ?>" <?= (isset($editUser) && $editUser['role'] === ROLE_MANAGER) || (!isset($editUser) && ($role ?? '') === ROLE_MANAGER) ? 'selected' : '' ?>><?= __('role_manager') ?></option>
+                    <option value="<?= ROLE_SUPERVISOR ?>" <?= (isset($editUser) && $editUser['role'] === ROLE_SUPERVISOR) || (!isset($editUser) && ($role ?? '') === ROLE_SUPERVISOR) ? 'selected' : '' ?>><?= __('role_supervisor') ?></option>
                 </select>
             </div>
         </div>
@@ -198,8 +199,14 @@ include __DIR__ . '/../templates/header.php';
                     <td><strong><?= sanitize($user['full_name']) ?></strong></td>
                     <td><?= sanitize($user['email']) ?></td>
                     <td>
-                        <span class="badge <?= $user['role'] === ROLE_MANAGER ? 'badge-progress' : 'badge-new' ?>">
-                            <?= $user['role'] === ROLE_MANAGER ? __('role_manager') : __('role_designer') ?>
+                        <?php
+                        $roleBadge = 'badge-new';
+                        $roleLabel = __('role_designer');
+                        if ($user['role'] === ROLE_MANAGER) { $roleBadge = 'badge-progress'; $roleLabel = __('role_manager'); }
+                        elseif ($user['role'] === ROLE_SUPERVISOR) { $roleBadge = 'badge-delivered'; $roleLabel = __('role_supervisor'); }
+                        ?>
+                        <span class="badge <?= $roleBadge ?>">
+                            <?= $roleLabel ?>
                         </span>
                     </td>
                     <td class="text-small"><?= !empty($user['telegram_chat_id']) ? sanitize($user['telegram_chat_id']) : '<span style="color:var(--text-secondary);">—</span>' ?></td>

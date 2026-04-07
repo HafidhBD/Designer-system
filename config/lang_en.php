@@ -134,6 +134,7 @@ $lang = [
     'role'              => 'Role',
     'role_manager'      => 'Manager',
     'role_designer'     => 'Designer',
+    'role_supervisor'   => 'Supervisor',
     'new_password'      => 'New Password',
     'leave_blank'       => 'Leave blank to keep current password',
     'user_created'      => 'User created successfully',

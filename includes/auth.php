@@ -47,6 +47,13 @@ function isDesigner() {
 }
 
 /**
+ * Check if current user is a supervisor
+ */
+function isSupervisor() {
+    return isLoggedIn() && $_SESSION['role'] === ROLE_SUPERVISOR;
+}
+
+/**
  * Require login — redirect to login page if not logged in
  */
 function requireLogin() {
@@ -73,6 +80,17 @@ function requireManager() {
 function requireDesigner() {
     requireLogin();
     if (!isDesigner()) {
+        header('Location: /index.php');
+        exit;
+    }
+}
+
+/**
+ * Require manager or supervisor role
+ */
+function requireManagerOrSupervisor() {
+    requireLogin();
+    if (!isManager() && !isSupervisor()) {
         header('Location: /index.php');
         exit;
     }

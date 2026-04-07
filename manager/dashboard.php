@@ -5,7 +5,7 @@
 require_once __DIR__ . '/../includes/auth.php';
 require_once __DIR__ . '/../includes/helpers.php';
 
-requireManager();
+requireManagerOrSupervisor();
 
 $pageTitle = __('nav_dashboard');
 
@@ -72,18 +72,22 @@ include __DIR__ . '/../templates/header.php';
         <h2 class="card-title"><?= __('quick_actions') ?></h2>
     </div>
     <div class="quick-actions">
+        <?php if (isManager()): ?>
         <a href="/manager/create_task.php" class="quick-action-btn">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
             <?= __('create_new_task') ?>
         </a>
+        <?php endif; ?>
         <a href="/manager/all_tasks.php" class="quick-action-btn">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
             <?= __('view_all_tasks') ?>
         </a>
+        <?php if (isManager()): ?>
         <a href="/manager/reports.php" class="quick-action-btn">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
             <?= __('view_reports') ?>
         </a>
+        <?php endif; ?>
     </div>
 </div>
 
@@ -97,7 +101,9 @@ include __DIR__ . '/../templates/header.php';
     <?php if (empty($recentTasks)): ?>
     <div class="empty-state">
         <p><?= __('no_tasks') ?></p>
+        <?php if (isManager()): ?>
         <a href="/manager/create_task.php" class="btn btn-primary"><?= __('create_new_task') ?></a>
+        <?php endif; ?>
     </div>
     <?php else: ?>
     <div class="table-wrapper">
@@ -111,7 +117,7 @@ include __DIR__ . '/../templates/header.php';
                     <th><?= __('deadline') ?></th>
                     <th><?= __('progress') ?></th>
                     <th><?= __('status') ?></th>
-                    <th><?= __('actions') ?></th>
+                    <?php if (isManager()): ?><th><?= __('actions') ?></th><?php endif; ?>
                 </tr>
             </thead>
             <tbody>
@@ -135,11 +141,13 @@ include __DIR__ . '/../templates/header.php';
                         <span class="progress-text"><?= (int)$task['progress_percentage'] ?>%</span>
                     </td>
                     <td><span class="badge <?= getStatusClass($task['status']) ?>"><?= getStatusLabel($task['status']) ?></span></td>
+                    <?php if (isManager()): ?>
                     <td>
                         <div class="btn-group">
                             <a href="/manager/edit_task.php?id=<?= $task['id'] ?>" class="btn btn-sm btn-outline"><?= __('edit') ?></a>
                         </div>
                     </td>
+                    <?php endif; ?>
                 </tr>
                 <?php endforeach; ?>
             </tbody>
